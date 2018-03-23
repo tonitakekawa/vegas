@@ -1,0 +1,10 @@
+{application,slime,
+             [{applications,[kernel,stdlib,elixir]},
+              {description,"An Elixir library for rendering slim templates.\n"},
+              {modules,['Elixir.Slime','Elixir.Slime.Compiler',
+                        'Elixir.Slime.Parser',
+                        'Elixir.Slime.Parser.AttributesKeyword',
+                        'Elixir.Slime.Renderer','Elixir.Slime.Tree',
+                        'Elixir.Slime.Tree.Branch']},
+              {registered,[]},
+              {vsn,"0.11.0"}]}.
