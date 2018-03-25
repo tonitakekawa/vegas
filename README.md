@@ -5,7 +5,7 @@ This project is Vega AP-server on phoenix
 
 ## features
 
- * stateless - all states are stored for key-value server or some RDBMS
+ * stateless - all states are stored in key-value server or some RDBMS
  * scaleoutable
 
 ## dependencies
