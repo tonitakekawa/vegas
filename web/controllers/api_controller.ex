@@ -1,5 +1,11 @@
+
 defmodule Ap.ApiController do
   use Ap.Web, :controller
+
+  # 処理を一般化すると
+  # 1. session => s1
+  # 2. s2 = function(s1)
+  # 3. s2 => session
 
   defp ssn(conn, default_state \\ :no_session) do
     s = get_session(conn, :cointoss_s) || default_state
@@ -29,10 +35,14 @@ defmodule Ap.ApiController do
 
   def init(conn, _params) do
 
+    IO.inspect conn
+
     # get session
-    {s, c, h, w} = ssn(conn, :wait)
+    {_s, c, h, w} = ssn(conn, :wait)
 
     # state guard
+
+    #fn a = () -> 1 end
 
     # 掛けコインがあれば戻しておく
     c = c + h
