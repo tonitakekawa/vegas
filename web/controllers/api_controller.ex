@@ -1,120 +1,147 @@
-
 defmodule Ap.ApiController do
   use Ap.Web, :controller
 
-  # 処理を一般化すると
-  # 1. session => s1
-  # 2. s2 = function(s1)
-  # 3. s2 => session
-
-  defp ssn(conn, default_state \\ :no_session) do
-    s = get_session(conn, :cointoss_s) || default_state
+  defp get_state(conn) do
+    s = get_session(conn, :cointoss_s) || :no_session
     c = get_session(conn, :cointoss_c) || 0
     h = get_session(conn, :cointoss_h) || 0
     w = get_session(conn, :cointoss_w) || 0
 
-    { s, c, h, w }
+    %{ conn: conn, state: s, coin: c, hand: h, win: w }
   end
 
-  defp upd(conn, s, c, h, w) do
-    conn
-    |> put_session(:cointoss_s, s)
-    |> put_session(:cointoss_c, c)
-    |> put_session(:cointoss_h, h)
-    |> put_session(:cointoss_w, w)
+  defp update_state(s) do
+    conn = s.conn
+    |> put_session(:cointoss_s, s.state)
+    |> put_session(:cointoss_c, s.coin)
+    |> put_session(:cointoss_h, s.hand)
+    |> put_session(:cointoss_w, s.win)
+
+    %{
+      conn: conn,
+      state: s.state,
+      coin: s.coin,
+      hand: s.hand,
+      win: s.win
+    }
   end
 
-  # -- todo 一関数で行ける
-  # message
-  # |> get session
-  # |> state guard
-  # |> state filter
-  # |> put session
-  # |> connection update
-  # |> return json
+  defp format(s, r) do
+    m = %{
+      state: s.state,
+      coin:  s.coin,
+      hand:  s.hand,
+      win:     s.win,
+      request: r
+    }
 
-  def init(conn, _params) do
+    %{conn: s.conn, map: m}
+  end
 
-    IO.inspect conn
-
-    # get session
-    {_s, c, h, w} = ssn(conn, :wait)
-
-    # state guard
-
-    #fn a = () -> 1 end
-
-    # 掛けコインがあれば戻しておく
-    c = c + h
-    h = 0
-
-    # 勝ちコインがあれば清算しておく
-    c = c + w
-    w = 0
-
-    # state filter
-    if 0 >= c do
-      c = 3
+  defp init_state_filter(s) do
+    c1 = s.coin + s.hand + s.win
+    c2 = case c1 do
+      0 -> 3
+      _ -> c1
     end
 
-    # 強制的に wait に遷移
-    s = :wait
+    %{
+      conn:  s.conn,
+      state: :wait,
+      coin:  c2,
+      hand:  0,
+      win:   0
+    }
+  end
 
-    # conn update
-    upd_conn = upd(conn, s, c, h, w)
+  defp bet_state_filter(s) do
+    bet_state_filter(s.state, s)
+  end
 
-    # return json
-    json upd_conn, format(s, c, h, w, "INIT")
+  defp bet_state_filter(:bet, s) do
+    %{
+      conn:  s.conn,
+      state: :error,
+      coin:  0,
+      hand:  0,
+      win:   0
+    }
+  end
+
+  defp bet_state_filter(_, s) do
+
+    {coin, hand} = case s.win do
+      0 -> { s.coin-1, 1      }    # ダブルアップでないのでコイン減算
+      _ -> { s.coin  , s.win  }    # ダブルアップ
+    end
+
+    %{
+      conn:  s.conn,
+      state: :bet,
+      coin:  coin,
+      hand:  hand,
+      win:   0
+    }
+  end
+
+  defp game_state_filter(s) do
+    game_state_filter(s.state, s)
+  end
+
+  defp game_state_filter(:bet, s) do
+
+    # 0 : 負け  1 : 勝ち
+    result = Enum.random(0..1)
+
+    {state, win} = case result do
+      0 -> { :wait  ,          0 } # 負け
+      1 -> { :result, s.hand * 2 } # 勝ち
+    end
+
+    %{
+      conn:  s.conn,
+      state: state,
+      coin:  s.coin,
+      hand:  0,
+      win:   win
+    }
+  end
+
+  defp game_state_filter(_, s) do
+    %{
+      conn:  s.conn,
+      state: :error,
+      coin:  0,
+      hand:  0,
+      win:   0
+    }
+  end
+
+  def init(conn, _params) do
+    s = get_state(conn)
+    |> init_state_filter
+    |> update_state
+    |> format("INIT")
+
+    json s.conn, s.map
   end
 
   def bet(conn, _params) do
+    s = get_state(conn)
+    |> bet_state_filter
+    |> update_state
+    |> format("BET")
 
-    # get session
-    {s, c, h, w} = ssn(conn)
-
-    # state guard
-    guard = case s do
-      :no_session -> "error"
-      :wait       -> "ok"
-      :bet        -> "error"
-      :result     -> "ok"
-    end
-
-    # state filter
-    {s, c, h, w} = case w do
-      0 -> { :bet, c-1, 1, 0 }    # ダブルアップでないのでコイン減算
-      _ -> { :bet, c  , w, 0 }    # ダブルアップ
-    end
-
-    # conn update
-    upd_conn = upd(conn, s, c, h, w)
-
-    # return json
-    json upd_conn, format(s, c, h, w, "BET")
+    json s.conn, s.map
   end
 
   def game(conn, _params) do
+    s = get_state(conn)
+    |> game_state_filter
+    |> update_state
+    |> format("GAME")
 
-    {s, c, h, w} = ssn(conn)
-
-    # TODO 状態ガード
-
-    # 0 : 負け
-    # 1 : 勝ち
-    r = Enum.random(0..1)
-
-    {s, c, h, w, msg} = case r do
-      0 -> { :wait  , c, 0,     0, "lose" } # 負け
-      1 -> { :result, c, 0, h * 2, "win"  } # 勝ち
-    end
-
-    upd_conn = upd(conn, s, c, h, w)
-
-    json upd_conn, format(s, c, h, w, "GAME")
-  end
-
-  defp format(s, c, h, w, r) do
-    %{state: s, coin: c, hand: h, win: w, request: r}
+    json s.conn, s.map
   end
 
 end
