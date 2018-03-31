@@ -19,4 +19,10 @@ This project is Vega AP-server on phoenix
 * cointoss/bet
 * cointoss/game
 
+## CORS
 
+* solve by some reverse proxy
+
+## HTTPS
+
+* Same as above

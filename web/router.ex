@@ -18,16 +18,16 @@ defmodule Ap.Router do
     #plug CORSPlug, [origin: "http://localhost:9999"]
   end
 
-  scope "/", Ap do
+  scope "/cointoss", Ap do
     pipe_through :api
     #pipe_through :browser
 
-    get       "/"                , PageController, :index   # browser用に残す
-    post      "/cointoss/init"   , ApiController , :init
-    post      "/cointoss/bet"    , ApiController,  :bet
-    post      "/cointoss/game"   , ApiController,  :game
+    post      "/init"     , ApiController  , :init
+    post      "/bet"      , ApiController  , :bet
+    post      "/game"     , ApiController  , :game
+    get       "/version"  , ApiController  , :version
 
-    resources "/todos"           , TodoController
+    resources "/todos"    , TodoController
 
   end
 

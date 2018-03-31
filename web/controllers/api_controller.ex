@@ -117,6 +117,10 @@ defmodule Ap.ApiController do
     }
   end
 
+  def version(conn, _param) do
+    json conn, %{version: "0.0.0"}
+  end
+
   def init(conn, _params) do
     s = get_state(conn)
     |> init_state_filter
