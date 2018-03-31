@@ -32,14 +32,6 @@ config :plug_session_redis, :config,
   pool:  [size: 2, max_overflow: 5],
   redis: [host: '192.168.3.5', port: 6379]
 
-  config :phoenix_slim_example, PhoenixSlimExample.Endpoint,
-  live_reload: [
-    patterns: [
-      ~r{priv/static/.*(js|css|png|jpeg|jpg|gif|svg)$},
-      ~r{web/views/.*(ex)$},
-      ~r{web/templates/.*(eex|slim|slime)$}
-    ]
-  ]
 
 
 import_config "#{Mix.env}.exs"
