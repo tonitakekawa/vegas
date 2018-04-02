@@ -49,6 +49,8 @@ defmodule Ap.Mixfile do
      {:exredis,             ">= 0.2.2"           },
      {:plug_session_redis,  "~> 0.1"             },
      {:cors_plug,           "~> 1.2"             },
+     {:comeonin,            "~> 3.0"},
+     {:guardian,            "~> 0.14"}
   ]
   end
 
