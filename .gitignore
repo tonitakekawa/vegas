@@ -4,6 +4,9 @@
 /deps
 /*.ez
 /*.beam
+/.elixir_ls
+
+/*.*.*.beam
 
 # Generated on crash by the VM
 erl_crash.dump

@@ -27,7 +27,8 @@ defmodule Ap.Mixfile do
       :gettext,
       :phoenix_ecto,
       :postgrex,
-      :plug_session_redis
+      :plug_session_redis,
+      :comeonin,
     ]
   ]
   end
@@ -49,9 +50,9 @@ defmodule Ap.Mixfile do
      {:exredis,             ">= 0.2.2"           },
      {:plug_session_redis,  "~> 0.1"             },
      {:cors_plug,           "~> 1.2"             },
-     {:comeonin,            "~> 3.0"},
-     {:guardian,            "~> 0.14"}
-  ]
+     {:comeonin,            "~> 4.1"             },
+     {:bcrypt_elixir, "~> 1.0"}
+      ]
   end
 
   defp aliases do
