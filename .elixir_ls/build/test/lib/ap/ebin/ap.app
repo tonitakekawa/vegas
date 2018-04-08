@@ -18,4 +18,4 @@
               {mod,{'Elixir.Ap',[]}},
               {applications,[kernel,stdlib,elixir,phoenix,phoenix_pubsub,
                              phoenix_html,cowboy,logger,gettext,phoenix_ecto,
-                             postgrex,plug_session_redis,comeonin]}]}.
+                             postgrex,plug_session_redis]}]}.

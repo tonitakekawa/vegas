@@ -24,6 +24,11 @@ defmodule Ap.UserController do
     end
   end
 
+  def create(conn, param) do
+    IO.inspect param
+    send_resp(conn, :no_content, "")
+  end
+
   def show(conn, %{"id" => id}) do
     user = Repo.get!(User, id)
     render(conn, "show.json", user: user)

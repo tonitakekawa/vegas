@@ -12,6 +12,9 @@ defmodule Ap.UserView do
   def render("user.json", %{user: user}) do
     %{id: user.id,
       userId: user.userId,
-      hashedPassword: user.hashedPassword}
+      hashedPassword: user.hashedPassword,
+      test: "10h",
+      result: true
+    }
   end
 end
